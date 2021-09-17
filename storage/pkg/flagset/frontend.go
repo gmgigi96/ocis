@@ -147,6 +147,20 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 			EnvVars:     []string{"STORAGE_FRONTEND_OCS_CACHE_WARMUP_DRIVER"},
 			Destination: &cfg.Reva.Frontend.OCSCacheWarmupDriver,
 		},
+		&cli.StringFlag{
+			Name:        "driver",
+			Value:       flags.OverrideDefaultString(cfg.Reva.StorageHome.Driver, "ocis"),
+			Usage:       "storage driver for home mount: eg. local, eos, owncloud, ocis or s3",
+			EnvVars:     []string{"STORAGE_HOME_DRIVER"},
+			Destination: &cfg.Reva.StorageHome.Driver,
+		},
+		&cli.BoolFlag{
+			Name:        "enable-home",
+			Value:       flags.OverrideDefaultBool(cfg.Reva.Storages.Common.EnableHome, true),
+			Usage:       "enable the creation of home directories",
+			EnvVars:     []string{"STORAGE_HOME_ENABLE_HOME"},
+			Destination: &cfg.Reva.Storages.Common.EnableHome,
+		},
 		// Gateway
 
 		&cli.StringFlag{
@@ -206,6 +220,7 @@ func FrontendWithConfig(cfg *config.Config) []cli.Flag {
 	flags = append(flags, SecretWithConfig(cfg)...)
 	flags = append(flags, SharingSQLWithConfig(cfg)...)
 	flags = append(flags, DriverEOSWithConfig(cfg)...)
+	flags = append(flags, DriverOCISWithConfig(cfg)...)
 
 	return flags
 }
