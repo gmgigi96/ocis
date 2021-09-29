@@ -167,6 +167,11 @@ func gatewayConfigFromStruct(c *cli.Context, cfg *config.Config, logger log.Logg
 				},
 				"appregistry": map[string]interface{}{
 					"driver": "static",
+					"drivers": map[string]interface{}{
+						"static": map[string]interface{}{
+							"mime_types": mimetypes(cfg, logger),
+						},
+					},
 				},
 				"storageregistry": map[string]interface{}{
 					"driver": cfg.Reva.StorageRegistry.Driver,
@@ -220,6 +225,27 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 		// public link storage returns the mount id of the actual storage
 		// medatada storage not part of the global namespace
 	}
+}
+
+func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]string {
+
+	// load default app mimetypes from a json file
+	if cfg.Reva.AppRegistry.MimetypesJSON != "" {
+		data, err := ioutil.ReadFile(cfg.Reva.AppRegistry.MimetypesJSON)
+		if err != nil {
+			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.Reva.AppRegistry.MimetypesJSON)
+			return nil
+		}
+		var defaultAppMimetypes map[string]map[string]string
+		if err = json.Unmarshal(data, &defaultAppMimetypes); err != nil {
+			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
+			return nil
+		}
+		return defaultAppMimetypes
+	}
+
+	return make(map[string]map[string]string)
+
 }
 
 // GatewaySutureService allows for the storage-gateway command to be embedded and supervised by a suture supervisor tree.
