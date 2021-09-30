@@ -227,7 +227,7 @@ func rules(cfg *config.Config, logger log.Logger) map[string]map[string]interfac
 	}
 }
 
-func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]string {
+func mimetypes(cfg *config.Config, logger log.Logger) (mimetypes map[string]map[string]string) {
 
 	// load default app mimetypes from a json file
 	if cfg.Reva.AppRegistry.MimetypesJSON != "" {
@@ -236,15 +236,87 @@ func mimetypes(cfg *config.Config, logger log.Logger) map[string]map[string]stri
 			logger.Error().Err(err).Msg("Failed to read app registry mimetypes from JSON file: " + cfg.Reva.AppRegistry.MimetypesJSON)
 			return nil
 		}
-		var defaultAppMimetypes map[string]map[string]string
-		if err = json.Unmarshal(data, &defaultAppMimetypes); err != nil {
+		if err = json.Unmarshal(data, &mimetypes); err != nil {
 			logger.Error().Err(err).Msg("Failed to unmarshal storage registry rules")
 			return nil
 		}
-		return defaultAppMimetypes
+		return mimetypes
 	}
 
-	return make(map[string]map[string]string)
+	logger.Info().Msg("No app registry mimetypes JSON file provided, loading default configuration")
+
+	return map[string]map[string]string{
+		"application/pdf": {
+			"extension":   "pdf",
+			"name":        "PDF",
+			"description": "PDF document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.oasis.opendocument.text": {
+			"extension":   "odt",
+			"name":        "OpenDocument",
+			"description": "OpenDocument text document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.oasis.opendocument.spreadsheet": {
+			"extension":   "ods",
+			"name":        "OpenSpreadsheet",
+			"description": "OpenDocument spreadsheet document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.oasis.opendocument.presentation": {
+			"extension":   "odp",
+			"name":        "OpenPresentation",
+			"description": "OpenDocument presentation document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.openxmlformats-officedocument.wordprocessingml.document": {
+			"extension":   "docx",
+			"name":        "Microsoft Word",
+			"description": "Microsoft Word document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet": {
+			"extension":   "xlsx",
+			"name":        "Microsoft Excel",
+			"description": "Microsoft Excel document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.openxmlformats-officedocument.presentationml.presentation": {
+			"extension":   "pptx",
+			"name":        "Microsoft PowerPoint",
+			"description": "Microsoft PowerPoint document",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/vnd.jupyter": {
+			"extension":   "ipynb",
+			"name":        "Jupyter Notebook",
+			"description": "Jupyter Notebook",
+			"icon":        "",
+			"default_app": "",
+		},
+		"text/markdown": {
+			"extension":   "md",
+			"name":        "Markdown file",
+			"description": "Markdown file",
+			"icon":        "",
+			"default_app": "",
+		},
+		"application/compressed-markdown": {
+			"extension":   "zmd",
+			"name":        "Compressed markdown file",
+			"description": "Compressed markdown file",
+			"icon":        "",
+			"default_app": "",
+		},
+	}
 
 }
 
